@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <style>
+      @font-face {
+        font-family: 'Cafe24Ssurround';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      *{
+        font-family : Cafe24Ssurround;
+      }
+
+      h1{
+        font-size : 30px;
+        font-weight : bolder;
+      }
+
+      .wrap{
+        width : 500px;
+        margin : auto;
+      }
+
+      .title{
+        margin-top : 20px;
+      }
+
+      .price{
+        font-size : 12px;
+        font-weight : normal;
+      }
+
+      .detail_goods{
+        margin-top : 15px;
+        font-size : 12px;
+      }
+
+      .submit_btn{
+          width : 110px;
+          margin : auto;
+      }
+
+      .exchange{
+          color : blue;
+
+      }
+
+      .order_list{
+          margin-top : 20px;
+      }
+
+    </style>
+
+    <script>
+        function submit(){
+            let name = $('#name').val();
+            let quantity = $('#quantity').val();
+            let address = $('#address').val();
+            let phone = $('#phone').val();
+
+            $.ajax({
+                type : "POST",
+                url : "/order",
+                data:{
+                    name_give : name,
+                    quantity_give : quantity,
+                    address_give : address,
+                    phone_give : phone
+                },
+                success : function(response){
+                    alert(response["msg"]);
+                    window.location.reload();
+                }
+            })
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET", // GET 방식으로 요청한다.
+                url: "https://quotation-api-cdn.dunamu.com/v1/forex/recent?codes=FRX.KRWUSD",
+                data: {}, // 요청하면서 함께 줄 데이터 (GET 요청시엔 비워두세요)
+                success: function (response) { // 서버에서 준 결과를 response라는 변수에 담음
+                    $('#exchange').empty();
+
+                    let ex_rate = response[0]['basePrice'];
+                    let tmp_html = `달러-원 환율 : ${ex_rate}`;
+                    $('#exchange').append(tmp_html);
+                }
+            })
+
+            $.ajax({
+                type : "GET",
+                url : "/order",
+                data : {},
+                success : function (response){
+                    let order_list = response['order_list'];
+
+                    for(let i=0; i < order_list.length; i++){
+                        let name = order_list[i]['name'];
+                        let quantity = order_list[i]['quantity'];
+                        let address = order_list[i]['address'];
+                        let phone = order_list[i]['phone'];
+
+                        let tmp_html = `
+                            <tr>
+                                 <td>${name}</td>
+                                 <td>${quantity}</td>
+                                 <td>${address}</td>
+                                 <td>${phone}</td>
+                             </tr>
+                        `;
+
+                        $('#od_list').append(tmp_html);
+                    }
+                }
+            })
+        });
+
+
+    </script>
+
+
+    <title>웹개발 종합반 1주차 숙제</title>
+</head>
+
+<body>
+  <div class = "wrap">
+    <div class="goods_img">
+      <img src = "https://compass-ssl.xbox.com/assets/05/02/05029ac6-4996-44a9-a081-a407f59f517d.jpg?n=991473_Feature-0_XSX_767x628_02.jpg" width="500px">
+    </div>
+
+    <div class="title">
+      <h1>XBOX Series X  <span class="price">가격 : 1,000,000원 / 개</span></h1>
+    </div>
+
+    <p class="detail_goods">
+      Xbox Series X는 Microsoft Xbox의 거치형 콘솔 게임기의 차세대판이자, Xbox의 차세대 클라우드 게임 서버에 탑재되는 하드웨어다. Xbox Series X는 Microsoft 엔지니어링 그룹 Cloud + AI Platform 사업부의 Microsoft Azure 개발진이 설계에 공동으로 참여해 개발된 게임기로, 거치형 콘솔 게임기와 클라우드 게임 서버 블레이드의 역할을 동시에 수행할 수 있는 다목적 하드웨어로 설계되었다.
+    <p/>
+
+    <p class="exchange" id="exchange">
+    </p>
+
+      <div class="input-group mb-3">
+          <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">주문자 이름</span>
+          </div>
+          <input type="text" class="form-control" aria-label="Username"
+                 aria-describedby="basic-addon1" id="name">
+      </div>
+
+      <div class="input-group mb-3">
+          <div class="input-group-prepend">
+              <label class="input-group-text" for="inputGroupSelect01">수량</label>
+          </div>
+          <select class="custom-select" id="quantity">
+              <option selected>-- 수량을 선택하세요 --</option>
+              <option value="1">1개</option>
+              <option value="2">2개</option>
+              <option value="3">3개</option>
+          </select>
+      </div>
+
+      <div class="input-group mb-3">
+          <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">주소</span>
+          </div>
+          <input type="text" class="form-control" aria-label="Username"
+                 aria-describedby="basic-addon1" id="address">
+      </div>
+
+      <div class="input-group mb-3">
+          <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">전화번호</span>
+          </div>
+          <input type="text" class="form-control" aria-label="Username"
+                 aria-describedby="basic-addon1" id="phone">
+      </div>
+
+      <div class="submit_btn">
+          <button type="button" class="btn btn-primary btn-lg" onclick="submit()">주문하기</button>
+      </div>
+
+      <div class = "order_list">
+          <table class="table">
+              <thead>
+              <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">수량</th>
+                  <th scope="col">주소</th>
+                  <th scope="col">전화번호</th>
+              </tr>
+              </thead>
+              <tbody id="od_list">
+              </tbody>
+          </table>
+      </div>
+
+  </div>
+</body>
+
+</html>
